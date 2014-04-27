@@ -91,7 +91,7 @@ def get_errors(output, filename):
                 break
 
         if not added:
-            errs.append((1, err))
+            errs.insert(0, (1, err))
     return sorted(errs, key=lambda tup: tup[0])
 
 
