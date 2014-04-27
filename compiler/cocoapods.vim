@@ -7,6 +7,7 @@ if exists("current_compiler")
   finish
 endif
 let current_compiler = "cocoapods"
+let s:plug = expand("<sfile>:p:h:h")
 
 if exists(":CompilerSet") != 2
   command -nargs=* CompilerSet setlocal <args>
@@ -16,7 +17,8 @@ let s:save_cpo = &cpo
 " set cpo&vim
 set cpo-=C
 
-CompilerSet makeprg=python\ test.py\ %
+execute 'CompilerSet makeprg="python ' .
+      \ s:plug . '/script/build.py' . " %"
 " let b:dispatch="pod --no-ansi spec lint %"
 
 CompilerSet errorformat=
