@@ -4,12 +4,35 @@ import subprocess
 import sys
 
 
-words = [
+# The order of these matters #superhack
+attrs = [
     'source_files',
     'license',
+    'git'
     'source',
-    'requires_arc'
+    'requires_arc',
+    'homepage',
+    'weak framework',
+    'framework',
+    'libraries',
+    'tag',
+    'commit',
+    'version',
+    'the description',
+    'summary',
+    'name',
+    'social media url',
+    'warnings must not be disabled',
 ]
+mappings = {
+    'commit': 'source',
+    'git': 'source',
+    'social media url': 'social_media_url',
+    'tag': 'source',
+    'the description': 'description',
+    'warnings must not be disabled': 'compiler_flags',
+    'weak framework': 'weak_frameworks',
+}
 file_contents = {}
 
 
@@ -50,9 +73,37 @@ def line_of_attr(attr, fname):
     contents = get_lines(fname)
     for idx, line in enumerate(contents):
         string = "%s.%s" % (identifier, attr)
-        if line.strip().startswith(string):
+        if line.lstrip(" #").startswith(string):
             return idx + 1
-    return idx - 1
+    return idx
+
+
+def get_errors(output, filename):
+    errs = []
+    for err in output:
+        for w in attrs:
+            added = False
+            if w in err:
+                attr = mappings.get(w, w)
+                ln = line_of_attr(attr, filename)
+                errs.append((ln, err))
+                added = True
+                break
+
+        if not added:
+            errs.append((1, err))
+    return sorted(errs, key=lambda tup: tup[0])
+
+
+def clean_output(output):
+    output = output[2:]
+    output = output[:-3]
+    cleaned = []
+    for line in output:
+        l = line.strip(' -\n\t')
+        if l:
+            cleaned.append(l.lower())
+    return cleaned
 
 
 def main(filename):
@@ -61,22 +112,8 @@ def main(filename):
         return
 
     output = run_command("pod spec lint " + filename)
-    output = output[2:]
-    output = output[:-3]
-    cleaned = []
-    for line in output:
-        l = line.strip(' -\n\t')
-        if l:
-            cleaned.append(l)
-
-    errs = []
-    for err in cleaned:
-        for w in words:
-            if w in err:
-                ln = line_of_attr(w, filename)
-                errs.append((ln, err))
-                break
-
+    cleaned = clean_output(output)
+    errs = get_errors(cleaned, filename)
     for ln, err in errs:
         print "%s:%d:%s" % (filename, ln, err)
 
