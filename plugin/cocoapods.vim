@@ -8,13 +8,24 @@ if exists("g:loaded_cocoapods") && g:loaded_cocoapods
 endif
 let g:loaded_cocoapods = 1
 
-augroup ft_podspec
-  autocmd!
-  autocmd BufNewFile,BufRead,BufWrite *.podspec setlocal filetype=podspec
-  autocmd BufNewFile,BufRead Podfile setlocal filetype=podfile
+let s:has_dispatch = 0
+if exists(":Dispatch")
+  let s:has_dispatch = 1
+else
+  if exists(":Make") != 2
+    command -nargs=* Make make <args> | cwindow
+  endif
+endif
 
-  autocmd FileType podspec,podfile set syntax=ruby
-  autocmd FileType podspec,podfile set commentstring=#%s
-  autocmd FileType podspec compiler cocoapods
-  autocmd FileType podfile setlocal makeprg=pod\ install\ >/dev/null
-augroup END
+autocmd FileType podspec,podfile call Setup()
+function! Setup()
+  if s:has_dispatch
+    if !hasmapto(":Dispatch", "n")
+      nnoremap <buffer> <leader>d :Dispatch<CR>
+    endif
+  else
+    if !hasmapto(":Make", "n")
+      nnoremap <buffer> <leader>d :Make<CR>
+    endif
+  endif
+endfunction
