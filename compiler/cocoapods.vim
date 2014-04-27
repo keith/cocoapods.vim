@@ -18,7 +18,6 @@ set cpo-=C
 
 execute 'CompilerSet makeprg=python\ ' .
       \ s:plug . '/script/build.py\ %'
-" let b:dispatch="pod --no-ansi spec lint %"
 
 CompilerSet errorformat=
       \%E%f:%l:Error\ \|\ %m,

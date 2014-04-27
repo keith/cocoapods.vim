@@ -14,6 +14,7 @@ augroup ft_podspec
   autocmd BufNewFile,BufRead Podfile setlocal filetype=podfile
 
   autocmd FileType podspec,podfile set syntax=ruby
+  autocmd FileType podspec,podfile set commentstring=#%s
   autocmd FileType podspec compiler cocoapods
   autocmd FileType podfile setlocal makeprg=pod\ install\ >/dev/null
 augroup END
