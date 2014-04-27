@@ -4,9 +4,22 @@ import subprocess
 import sys
 
 
+words = [
+    'source_files',
+    'license',
+    'source',
+    'requires_arc'
+]
+file_contents = {}
+
+
 def get_lines(filename):
+    if filename in file_contents:
+        return file_contents[filename]
     with open(filename, "r") as f:
-        return f.readlines()
+        lines = f.readlines()
+        file_contents[filename] = lines
+        return lines
 
 
 def command_success(command):
@@ -32,18 +45,10 @@ def run_command(command):
     return out.stdout.readlines()
 
 
-words = ['source_files', 'license', 'source', 'requires_arc']
-
-
 def line_of_attr(attr, fname):
-    # print attr
     identifier = spec_identifier(fname)
     contents = get_lines(fname)
     for idx, line in enumerate(contents):
-        # print line
-        # print identifier
-        # print attr
-        # break
         string = "%s.%s" % (identifier, attr)
         if line.strip().startswith(string):
             return idx + 1
@@ -51,21 +56,19 @@ def line_of_attr(attr, fname):
 
 
 def main(filename):
-    # print filename
-    # print get_lines(filename)
     if not command_success("pod --version"):
         print "Pod command missing or broken"
         return
+
     output = run_command("pod spec lint " + filename)
     output = output[2:]
     output = output[:-3]
-    print output
     cleaned = []
     for line in output:
         l = line.strip(' -\n\t')
         if l:
             cleaned.append(l)
-    # print cleaned
+
     errs = []
     for err in cleaned:
         for w in words:
@@ -73,7 +76,7 @@ def main(filename):
                 ln = line_of_attr(w, filename)
                 errs.append((ln, err))
                 break
-    # print errs
+
     for ln, err in errs:
         print "%s:%d:%s" % (filename, ln, err)
 
