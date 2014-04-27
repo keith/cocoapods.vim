@@ -14,11 +14,10 @@ if exists(":CompilerSet") != 2
 endif
 
 let s:save_cpo = &cpo
-" set cpo&vim
 set cpo-=C
 
-execute 'CompilerSet makeprg="python ' .
-      \ s:plug . '/script/build.py' . " %"
+execute 'CompilerSet makeprg=python\ ' .
+      \ s:plug . '/script/build.py\ %'
 " let b:dispatch="pod --no-ansi spec lint %"
 
 CompilerSet errorformat=
