@@ -1,2 +1,2 @@
-setlocal commentstring=abc%s
+setlocal commentstring=#\ %s
 compiler cocoapods
