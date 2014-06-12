@@ -9,7 +9,7 @@ endif
 let g:loaded_cocoapods = 1
 
 let s:has_dispatch = 0
-if exists(":Dispatch")
+if exists(":Dispatch") == 2
   let s:has_dispatch = 1
 else
   if exists(":Make") != 2
